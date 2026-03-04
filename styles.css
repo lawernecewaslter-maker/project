@@ -159,7 +159,7 @@ input, select, textarea {
 }
 .specs { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
 
-.checkout-card, .confirm-card, .admin-card {
+.checkout-card, .confirm-card {
   max-width: 650px;
   margin: 1rem auto;
   background: var(--surface);

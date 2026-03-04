@@ -28,10 +28,9 @@ function handleHeaderOnScroll() {
   }
   lastScrollY = current;
 }
-const key = 'drivenow_custom_inventory';
 const favKey = 'drivenow_favorites';
 let state = {
-  vehicles: [...seedVehicles, ...JSON.parse(localStorage.getItem(key) || '[]')],
+  vehicles: [...seedVehicles],
   filters: { make: '', model: '', year: '', price: 100000, mileage: 200000, bodyType: '' },
   favorites: JSON.parse(localStorage.getItem(favKey) || '[]'),
   selectedBrand: ''
@@ -191,28 +190,6 @@ function confirmationPage(payload) {
   </div>`;
 }
 
-function adminPage() {
-  app.innerHTML = `<div class="admin-card">
-    <h2>Admin Panel</h2>
-    <p class="meta">Add vehicles manually to inventory.</p>
-    <form onsubmit="addVehicle(event)">
-      <div class="search-grid">
-        <input name="image" placeholder="Car image URL" required />
-        <input name="make" placeholder="Make" required />
-        <input name="model" placeholder="Model" required />
-        <input name="year" type="number" placeholder="Year" required />
-        <input name="mileage" type="number" placeholder="Mileage" required />
-        <input name="price" type="number" placeholder="Price" required />
-        <select name="bodyType" required>
-          <option value="">Body Type</option><option>Sedan</option><option>SUV</option><option>Truck</option>
-        </select>
-      </div>
-      <textarea name="description" placeholder="Description" rows="3" required></textarea>
-      <button class="btn" type="submit">Add Vehicle</button>
-    </form>
-  </div>`;
-}
-
 function router() {
   const hash = location.hash || '#/';
   const [_, route, param] = hash.split('/');
@@ -224,7 +201,6 @@ function router() {
     const raw = sessionStorage.getItem('purchase_payload');
     return raw ? confirmationPage(JSON.parse(raw)) : inventoryPage();
   }
-  if (route === 'admin') return adminPage();
   homePage();
 }
 
@@ -235,21 +211,6 @@ window.confirmPurchase = (id) => {
   const payload = { orderNumber: `ORD-${Date.now().toString().slice(-8)}`, name: `${car.year} ${car.make} ${car.model}` };
   sessionStorage.setItem('purchase_payload', JSON.stringify(payload));
   location.hash = '#/confirm/success';
-};
-window.addVehicle = (e) => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target).entries());
-  const item = {
-    id: `${data.make}-${data.model}-${Date.now()}`.replace(/\s+/g, '-').toLowerCase(),
-    make: data.make, model: data.model, year: Number(data.year), mileage: Number(data.mileage), bodyType: data.bodyType,
-    price: Number(data.price), location: 'Added via Admin', engine: 'N/A', transmission: 'Automatic', drivetrain: 'FWD', fuelEconomy: 'N/A', description: data.description,
-    images: [data.image]
-  };
-  const custom = JSON.parse(localStorage.getItem(key) || '[]');
-  custom.push(item);
-  localStorage.setItem(key, JSON.stringify(custom));
-  state.vehicles.push(item);
-  location.hash = '#/inventory';
 };
 window.toggleFavorite = toggleFavorite;
 
